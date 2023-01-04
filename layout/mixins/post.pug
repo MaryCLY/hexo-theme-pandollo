@@ -17,7 +17,17 @@ mixin articlesByType()
                                 != post.title
             - })
         else if is_tag()
-            h3.archive__title.article__title Tag: #{page.tag}
+            h3.archive__title.article__title 标签： #{page.tag}
+            - page.posts.each(function (post) {
+                ul.archive__list
+                    li.archive__list__item
+                        span.archive__list__item__text.metadata
+                            != full_date(post.date, 'YYYY/MM/DD')
+                        a.archive__list__item__link(href=url_for(post.path) title=post.from)
+                            != post.title
+            - })
+        else if is_category()
+            h3.archive__title.article__title 分类 #{page.category}
             - page.posts.each(function (post) {
                 ul.archive__list
                     li.archive__list__item
@@ -49,16 +59,25 @@ mixin articleInfo(post)
 
 mixin article(post)
     article.article.post
-        h3.article__title
+        h1.article__title
             != post.title
         .article__date.metadata
             +articleInfo(post)
-        .article__tags.metadata
-            | Tags:
-            |
-            - page.tags.each(function(tag) {
-                a.article__tags__link.metadata(href=url_for(tag.path))
-                    != tag.name
-            - })
+        if post.categories && post.categories.each
+            .article__categories.metadata
+                | 分类:
+                |
+                - post.categories.each(function(category) {
+                    a.article__categories__link.metadata(href=url_for(category.path))
+                        != category.name
+                - })
+        if post.tags && post.tags.each
+            .article__tags.metadata
+                | 标签:
+                |
+                - post.tags.each(function(tag) {
+                    a.article__tags__link.metadata(href=url_for(tag.path))
+                        != tag.name
+                - })
         .article__body
             != post.content
